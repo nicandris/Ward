@@ -16,6 +16,7 @@ function setupInitialization()
 
     serverName = document.getElementById("server-name");
     port = document.getElementById("port");
+    enableFog = document.getElementById("enableFog");
 
     setupXHR = new XMLHttpRequest();
 
@@ -117,7 +118,8 @@ function sendSetupRequest()
     {
         "serverName": serverName.value,
         "theme": html.getAttribute("theme"),
-        "port": port.value
+        "port": port.value,
+        "enableFog": enableFog.value
     }
 
         setupXHR.send(JSON.stringify(data));

@@ -76,6 +76,7 @@ If you want to change Ward's configuration, you can edit `setup.ini`. When using
 | serverName | Name shown in the interface. | Ward    |
 | theme      | Either `light` or `dark`.    | light   |
 | port       | Port to listen on.           | 4000    |
+| enableFog  | Either `true` or `false`.    | true    |
 
 Environment variables take priority and will regenerate this file with your variables. If no environment variables are set, `setup.ini` is generated once you navigate to Ward's webpage and complete the initial setup. You can also make this file yourself before starting Ward, and place it in the same directory.
 
@@ -86,4 +87,5 @@ For example:
 serverName = my-server
 theme = dark
 port = 8200
+enableFog = true
 ```

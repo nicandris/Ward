@@ -80,6 +80,7 @@ public class IndexService
 
         model.addAttribute("theme", utilitiesComponent.getFromIniFile("theme"));
         model.addAttribute("serverName", utilitiesComponent.getFromIniFile("serverName"));
+        model.addAttribute("enableFog", utilitiesComponent.getFromIniFile("enableFog"));
 
         model.addAttribute("info", infoService.getInfo());
         model.addAttribute("uptime", uptimeService.getUptime());

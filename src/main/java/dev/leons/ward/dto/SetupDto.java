@@ -42,4 +42,12 @@ public class SetupDto
     @Min(value = 10)
     @Max(value = 65535)
     private String port;
+
+    /**
+     * Enable fog field
+     */
+    @NotNull
+    @NotEmpty
+    @Pattern(regexp = "true|false")
+    private String enableFog;
 }
