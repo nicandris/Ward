@@ -50,4 +50,11 @@ public class SetupDto
     @NotEmpty
     @Pattern(regexp = "true|false")
     private String enableFog;
+
+    /**
+     * Background Color field
+     */
+    @NotEmpty
+    @Pattern(regexp = "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$|default")
+    private String backgroundColor;
 }
