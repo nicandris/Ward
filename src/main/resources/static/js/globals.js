@@ -9,6 +9,13 @@ let html;
  * Used to determine background object
  */
 let background;
+
+
+/**
+ * Used to determine background color
+ */
+let backgroundColor;
+
 /**
  * Used to determine if we enable the fog
  */
