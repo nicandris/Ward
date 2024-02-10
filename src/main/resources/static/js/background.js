@@ -31,6 +31,9 @@ if (html.getAttribute("enableFog") == "true")
     }
     else
     {
+        if (background){
+            background.destroy();
+        }
         if (html.getAttribute("backgroundColor") == "default" )
         {
             document.body.style.backgroundColor = html.getAttribute("theme") == "light" ? "#e5e5e5" : "#303030"
