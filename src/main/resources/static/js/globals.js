@@ -97,6 +97,11 @@ let currentTotalStorage
 let currentDiskCount
 
 /**
+ * Used to hold values of swap
+ */
+let currentSwap
+
+/**
  * Used to manipulate processor triangle div
  */
 let processorTriangle;
@@ -117,6 +122,21 @@ let storageTriangle;
 let currentPage;
 
 /**
+ * Used to determine current disk page
+ */
+let currentDiskPage;
+
+/**
+ * Used to determine totalDisks
+ */
+let totalDisks;
+
+/**
+ * Used to determine storageName
+ */
+let storageName;
+
+/**
  * Used to select pages
  */
 let firstControl;
@@ -125,6 +145,15 @@ let firstControl;
  * Used to select pages
  */
 let secondControl;
+/**
+ * Used to select disk pages
+ */
+let firstDiskControl;
+
+/**
+ * Used to select disk pages
+ */
+let secondDiskControl;
 
 /**
  * Used to determine logo page

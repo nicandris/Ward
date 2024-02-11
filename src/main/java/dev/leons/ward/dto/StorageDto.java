@@ -1,7 +1,10 @@
 package dev.leons.ward.dto;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.List;
 
 /**
  * StorageDto is a values container for presenting storage principal information
@@ -11,13 +14,8 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class StorageDto
-{
-    /**
-     * Host0 storage name field
-     */
-    private String mainStorage;
-
+@Builder
+public class StorageDto {
     /**
      * Amount of total installed storage field
      */
@@ -32,4 +30,9 @@ public class StorageDto
      * Total amount of virtual memory (Swap on Linux) field
      */
     private String swapAmount;
+
+    /**
+     * Disks field
+     */
+    private List<DiskDto> disks;
 }

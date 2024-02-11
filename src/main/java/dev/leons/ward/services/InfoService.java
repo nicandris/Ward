@@ -5,6 +5,7 @@ import dev.leons.ward.dto.InfoDto;
 import dev.leons.ward.dto.MachineDto;
 import dev.leons.ward.dto.ProcessorDto;
 import dev.leons.ward.dto.StorageDto;
+import dev.leons.ward.dto.DiskDto;
 import dev.leons.ward.components.UtilitiesComponent;
 import dev.leons.ward.exceptions.ApplicationNotConfiguredException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,15 +13,13 @@ import org.springframework.stereotype.Service;
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
 import oshi.hardware.GlobalMemory;
-import oshi.hardware.HWDiskStore;
 import oshi.hardware.PhysicalMemory;
+import oshi.software.os.OSFileStore;
 import oshi.software.os.OperatingSystem;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * InfoService provides various information about machine, such as processor name, core count, Ram amount, etc.
@@ -29,8 +28,7 @@ import java.util.regex.Pattern;
  * @version 1.0.2
  */
 @Service
-public class InfoService
-{
+public class InfoService {
     /**
      * Autowired SystemInfo object
      * Used for getting machine information
@@ -51,17 +49,13 @@ public class InfoService
      * @param hertzArray raw frequency array values in hertz for each logical processor
      * @return String with formatted frequency and postfix
      */
-    private String getConvertedFrequency(final long[] hertzArray)
-    {
+    private String getConvertedFrequency(final long[] hertzArray) {
         long totalFrequency = Arrays.stream(hertzArray).sum();
         long hertz = totalFrequency / hertzArray.length;
 
-        if ((hertz / 1E+6) > 999)
-        {
+        if ((hertz / 1E+6) > 999) {
             return (Math.round((hertz / 1E+9) * 10.0) / 10.0) + " GHz";
-        }
-        else
-        {
+        } else {
             return Math.round(hertz / 1E+6) + " MHz";
         }
     }
@@ -72,21 +66,14 @@ public class InfoService
      * @param bits raw capacity value in bits
      * @return String with formatted capacity and postfix
      */
-    private String getConvertedCapacity(final long bits)
-    {
-        if ((bits / 1.049E+6) > 999)
-        {
-            if ((bits / 1.074E+9) > 999)
-            {
+    private static String getConvertedCapacity(final long bits) {
+        if ((bits / 1.049E+6) > 999) {
+            if ((bits / 1.074E+9) > 999) {
                 return (Math.round((bits / 1.1E+12) * 10.0) / 10.0) + " TiB";
-            }
-            else
-            {
+            } else {
                 return Math.round(bits / 1.074E+9) + " GiB";
             }
-        }
-        else
-        {
+        } else {
             return Math.round(bits / 1.049E+6) + " MiB";
         }
     }
@@ -96,15 +83,13 @@ public class InfoService
      *
      * @return ProcessorDto with filled fields
      */
-    private ProcessorDto getProcessor()
-    {
+    private ProcessorDto getProcessor() {
         ProcessorDto processorDto = new ProcessorDto();
 
         CentralProcessor centralProcessor = systemInfo.getHardware().getProcessor();
 
         String name = centralProcessor.getProcessorIdentifier().getName();
-        if (name.contains("@"))
-        {
+        if (name.contains("@")) {
             name = name.substring(0, name.indexOf('@') - 1);
         }
         processorDto.setName(name.trim());
@@ -124,8 +109,7 @@ public class InfoService
      *
      * @return MachineDto with filled fields
      */
-    private MachineDto getMachine()
-    {
+    private MachineDto getMachine() {
         MachineDto machineDto = new MachineDto();
 
         OperatingSystem operatingSystem = systemInfo.getOperatingSystem();
@@ -136,12 +120,9 @@ public class InfoService
         machineDto.setTotalRam(getConvertedCapacity(globalMemory.getTotal()) + " Ram");
 
         Optional<PhysicalMemory> physicalMemoryOptional = globalMemory.getPhysicalMemory().stream().findFirst();
-        if (physicalMemoryOptional.isPresent())
-        {
+        if (physicalMemoryOptional.isPresent()) {
             machineDto.setRamTypeOrOSBitDepth(physicalMemoryOptional.get().getMemoryType());
-        }
-        else
-        {
+        } else {
             machineDto.setRamTypeOrOSBitDepth(operatingSystem.getBitness() + "-bit");
         }
 
@@ -156,40 +137,21 @@ public class InfoService
      *
      * @return StorageDto with filled fields
      */
-    private StorageDto getStorage()
-    {
-        StorageDto storageDto = new StorageDto();
+    private StorageDto getStorage() {
+        final GlobalMemory globalMemory = systemInfo.getHardware().getMemory();
+        final List<OSFileStore> fileStores = systemInfo.getOperatingSystem().getFileSystem().getFileStores();
 
-        List<HWDiskStore> hwDiskStores = systemInfo.getHardware().getDiskStores();
-        GlobalMemory globalMemory = systemInfo.getHardware().getMemory();
-
-        Optional<HWDiskStore> hwDiskStoreOptional = hwDiskStores.stream().findFirst();
-        if (hwDiskStoreOptional.isPresent())
-        {
-            String mainStorage = hwDiskStoreOptional.get().getModel();
-            Matcher matcher = Pattern.compile("\\(.{1,15} .{1,15} .{1,15}\\)").matcher(mainStorage);
-
-            if (matcher.find())
-            {
-                mainStorage = mainStorage.substring(0, matcher.start() - 1);
-            }
-
-            storageDto.setMainStorage(mainStorage.trim());
-        }
-        else
-        {
-            storageDto.setMainStorage("Undefined");
-        }
-
-        long total = hwDiskStores.stream().mapToLong(HWDiskStore::getSize).sum();
-        storageDto.setTotal(getConvertedCapacity(total) + " Total");
-
-        int diskCount = hwDiskStores.size();
-        storageDto.setDiskCount(diskCount + ((diskCount > 1) ? " Disks" : " Disk"));
-
-        storageDto.setSwapAmount(getConvertedCapacity(globalMemory.getVirtualMemory().getSwapTotal()) + " Swap");
-
-        return storageDto;
+        final long total = fileStores.stream().mapToLong(OSFileStore::getTotalSpace).sum();
+        final List<DiskDto> disks = getDisks(fileStores);
+        final String diskCount = disks.size() + ((disks.size() > 1) ? " Disks" : " Disk");
+        final String totalCapacity = getConvertedCapacity(total) + " Total";
+        final String swap = getConvertedCapacity(globalMemory.getVirtualMemory().getSwapTotal()) + " Swap";
+        return StorageDto.builder()
+                .disks(disks)
+                .diskCount(diskCount)
+                .total(totalCapacity)
+                .swapAmount(swap)
+                .build();
     }
 
     /**
@@ -197,10 +159,8 @@ public class InfoService
      *
      * @return InfoDto filled with server info
      */
-    public InfoDto getInfo() throws ApplicationNotConfiguredException
-    {
-        if (!Ward.isFirstLaunch())
-        {
+    public InfoDto getInfo() throws ApplicationNotConfiguredException {
+        if (!Ward.isFirstLaunch()) {
             InfoDto infoDto = new InfoDto();
 
             infoDto.setProcessor(getProcessor());
@@ -208,10 +168,17 @@ public class InfoService
             infoDto.setStorage(getStorage());
 
             return infoDto;
-        }
-        else
-        {
+        } else {
             throw new ApplicationNotConfiguredException();
         }
+    }
+
+    private static List<DiskDto> getDisks(final List<OSFileStore> fileStores) {
+        return fileStores.stream().map(fileStore -> DiskDto.builder()
+                .size(getConvertedCapacity(fileStore.getTotalSpace()))
+                .free(getConvertedCapacity(fileStore.getFreeSpace()))
+                .name(fileStore.getName())
+                .mount(fileStore.getMount())
+                .build()).toList();
     }
 }

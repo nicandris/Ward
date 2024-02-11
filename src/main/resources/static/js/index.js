@@ -14,10 +14,16 @@ function indexInitialization()
     currentProcCount = document.getElementById("currentProcCount");
     currentTotalStorage = document.getElementById("currentTotalStorage");
     currentDiskCount = document.getElementById("currentDiskCount");
+    currentSwap = document.getElementById("currentSwap");
 
     currentPage = 1;
     firstControl = document.getElementById("first-control");
     secondControl = document.getElementById("second-control");
+
+    currentDiskPage = 0;
+    storageName = document.getElementById("storage-name");
+    firstDiskControl = document.getElementById("first-disk-control");
+    secondDiskControl = document.getElementById("second-disk-control");
 
     cloudLeft = document.getElementById("cloud-left");
     cloudRight = document.getElementById("cloud-right");
@@ -35,6 +41,9 @@ function indexInitialization()
 
     firstControl.addEventListener("click", function(event) {changePage(event.target || event.srcElement)});
     secondControl.addEventListener("click", function(event) {changePage(event.target || event.srcElement)});
+
+    firstDiskControl.addEventListener("click", function(event) {changeDiskPage(event.target || event.srcElement)});
+    secondDiskControl.addEventListener("click", function(event) {changeDiskPage(event.target || event.srcElement)});
 }
 
 /**
@@ -118,9 +127,7 @@ function sendInfoRequest()
 
             currentClockSpeed.innerHTML = response.processor.clockSpeed;
             currentProcCount.innerHTML = response.machine.procCount;
-            currentTotalStorage.innerHTML = response.storage.total;
-            currentDiskCount.innerHTML = response.storage.diskCount;
-
+            changeDiskDetails(response);
             sendUptimeRequest();
         }
     }
@@ -154,6 +161,33 @@ function sendUptimeRequest()
 }
 
 /**
+ * Sets disk details
+ *
+ * @param {*} control element
+ */
+function changeDiskDetails(response)
+{
+    currentDiskCount.innerHTML = response.storage.diskCount;
+    totalDisks = response.storage.disks.length;
+
+    if (currentDiskPage == 0)
+    {
+        storageName.innerHTML = "Total";
+        currentTotalStorage.innerHTML = response.storage.total;
+        currentSwap.innerHTML = response.storage.swapAmount;
+    }
+    else if (currentDiskPage <= totalDisks)
+    {
+        let disk = response.storage.disks[currentDiskPage - 1];
+        storageName.innerHTML = disk.name;
+        currentTotalStorage.innerHTML = disk.mount;
+        currentDiskCount.innerHTML = disk.size;
+        currentSwap.innerHTML = disk.free + ' Free';
+    }
+}
+
+
+/**
  * Changes page
  *
  * @param {*} control element
@@ -173,6 +207,25 @@ function changePage(element)
 
     setPageVisibility(currentPage);
     setControlOpacity(currentPage);
+}
+
+/**
+ * Changes disk page
+ *
+ * @param {*} control element
+ */
+function changeDiskPage(element)
+{
+    if ((String(element.id) == "first-disk-control") && (currentDiskPage > 0))
+    {
+        currentDiskPage -= 1;
+        resetDiskControl();
+}
+    else if ((String(element.id) == "second-disk-control") && (currentDiskPage < totalDisks))
+    {
+        currentDiskPage += 1;
+        resetDiskControl();
+    }
 }
 
 /**
@@ -242,6 +295,50 @@ function setControlOpacity(newSquareScale)
         {
             firstControl.style.opacity = "1";
             secondControl.style.opacity = "0.5";
+            break;
+        }
+    }
+}
+
+/**
+ * Reset disk control
+ *
+ * @param {*} new page
+ */
+function resetDiskControl()
+{
+    storageName.innerHTML = '...';
+    currentTotalStorage.innerHTML = '...';
+    currentDiskCount.innerHTML = '...';
+    currentSwap.innerHTML = '...';
+    setDiskControlOpacity();
+}
+
+/**
+ * Changes opacity of disk control
+ *
+ * @param {*} new page
+ */
+function setDiskControlOpacity()
+{
+    switch (currentDiskPage)
+    {
+        case 0:
+        {
+            firstDiskControl.style.opacity = "0.5";
+            secondDiskControl.style.opacity = "1";
+            break;
+        }
+        case totalDisks:
+        {
+            firstDiskControl.style.opacity = "1";
+            secondDiskControl.style.opacity = "0.5";
+            break;
+        }
+        default:
+        {
+            firstDiskControl.style.opacity = "1";
+            secondDiskControl.style.opacity = "1";
             break;
         }
     }

@@ -50,7 +50,18 @@ function labelsTick(usageData)
             }
             case 2:
             {
-                formatLabels(storageLabelsArray, usageDataArray[i]);
+                if (currentDiskPage == 0)
+                {
+                    formatLabels(storageLabelsArray, usageDataArray[i]);
+                }
+                break;
+            }
+            case 3:
+            {
+                if (currentDiskPage > 0)
+                {
+                    formatLabels(storageLabelsArray, usageDataArray[i][currentDiskPage - 1]);
+                }
                 break;
             }
         }

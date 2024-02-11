@@ -1,7 +1,10 @@
 package dev.leons.ward.dto;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.List;
 
 /**
  * UsageDto is a values container for presenting server usage
@@ -11,8 +14,8 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class UsageDto
-{
+@Builder
+public class UsageDto {
     /**
      * Processor usage field
      */
@@ -24,7 +27,12 @@ public class UsageDto
     private int ram;
 
     /**
-     * Storage usage field
+     * Total storage usage field
      */
     private int storage;
+
+    /**
+     * Disk usage field
+     */
+    private List<Integer> disks;
 }

@@ -133,11 +133,15 @@
                 </div>
                 <div class = "col-sm-12 col-md-6 col-lg-6 col-xl-4">
                     <div class = "card">
+                        <div class = "controls-disk">
+                            <img id = "first-disk-control" class = "first" th:src = @{/img/controls/left.png} />
+                            <img id = "second-disk-control" class = "second" th:src = @{/img/controls/right.png} />
+                        </div>
                         <div class = "header">
                             <div class = "hw-logo third"></div>
                             <div class = "label-hw-info">
                                 <div class = "hw-type">Storage</div>
-                                <div class = "hw-name" th:text = "${info.storage.mainStorage}"></div>
+                                <div class = "hw-name" id="storage-name"></div>
                             </div>
                         </div>
                         <div class = "usage">
@@ -174,7 +178,7 @@
                             <div class = "detailed-hw-info">
                                 <div id = "currentTotalStorage" class = "first" th:text = "${info.storage.total}"></div>
                                 <div id = "currentDiskCount" class = "second" th:text = "${info.storage.diskCount}"></div>
-                                <div class = "third" th:text = "${info.storage.swapAmount}"></div>
+                                <div id = "currentSwap" class = "third" th:text = "${info.storage.swapAmount}"></div>
                             </div>
                             <div class = "dividers">
                                 <div class = "first"></div>

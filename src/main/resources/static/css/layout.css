@@ -715,6 +715,42 @@ body {
     transform: var(--transform-controls-second-active);
 }
 
+.controls-disk {
+    position: absolute;
+    height: var(--height-controls);
+    width: var(--width-controls);
+}
+
+.controls-disk > img {
+    position: absolute;
+    top: var(--top-controls-img);
+    z-index: 2;
+    height: var(--height-controls-img);
+    width: var(--width-controls-img);
+    border-radius: var(--border-radius-controls-img);
+}
+
+.controls-disk > .first {
+    left: var(--left-controls-first-disk);
+    opacity: 0.5;
+    animation: wiggle-first-control;
+    animation-duration: var(--animation-duration-wiggle-first-control);
+}
+
+.controls-disk > .second {
+    left: var(--left-controls-second);
+    animation: wiggle-second-control;
+    animation-duration: var(--animation-duration-wiggle-second-control);
+}
+
+.controls-disk > .first:active {
+    transform: var(--transform-controls-first-active);
+}
+
+.controls-disk > .second:active {
+    transform: var(--transform-controls-second-active);
+}
+
 .pages {
     position: absolute;
 }
